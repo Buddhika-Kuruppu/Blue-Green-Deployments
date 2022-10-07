@@ -18,26 +18,27 @@ terraform {
 # Traffic Manager provisioning #
 #==============================#
 
-resource "random_id" "server" {
-  keepers = {
-    azi_id = 1
-  }
-
-  byte_length = 8
-}
-
-resource "azurerm_resource_group" "tm_rg" {
-  name     = "trafficmanagerProfile-RG"
+resource "azurerm_resource_group" "example" {
+  name     = "example-resources"
   location = "West Europe"
 }
 
-resource "azurerm_traffic_manager_profile" "tm_profile" {
-  name                   = random_id.server.hex
+resource "azurerm_public_ip" "example" {
+  name                = "example-public-ip"
+  location            = azurerm_resource_group.example.location
+  resource_group_name = azurerm_resource_group.example.name
+  allocation_method   = "Static"
+  domain_name_label   = "example-public-ip"
+}
+
+
+resource "azurerm_traffic_manager_profile" "example" {
+  name                   = "example-profile"
   resource_group_name    = azurerm_resource_group.example.name
-  traffic_routing_method = "Priority" #For Blue/Green Deployment purpose 
+  traffic_routing_method = "Weighted"
 
   dns_config {
-    relative_name = random_id.server.hex
+    relative_name = "example-profile"
     ttl           = 100
   }
 
@@ -51,6 +52,13 @@ resource "azurerm_traffic_manager_profile" "tm_profile" {
   }
 
   tags = {
-    environment = "Blue-Green-Testing"
+    environment = "Production"
   }
+}
+
+resource "azurerm_traffic_manager_azure_endpoint" "example" {
+  name               = "example-endpoint"
+  profile_id         = azurerm_traffic_manager_profile.example.id
+  weight             = 100
+  target_resource_id = azurerm_public_ip.example.id
 }
