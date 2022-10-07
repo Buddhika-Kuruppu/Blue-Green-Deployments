@@ -4,4 +4,10 @@ Blue-Green Deployment is a software/Application rollout methodology in order to 
 
 <img src="https://miro.medium.com/max/1200/1*CvzbdfO9sLeNn_YZfJxu2g.png" alt="Blue-Green" style="width:600px;" align="middle">
 
+| Pros |Cons  |
+|--|--|
+|1. Simple with easy adaptability| Implementing cost is relatively high |
+|2. Traffic cut-over is straightforward and can do quickly| UAT might not be enough for all feature/Bug testing |
+|3. Low risk comparatively with other strategies| Any traffic switch-over issue may affect business severely |
+
 In this repository contains configuration details in Azure environment with Azure Traffic manager for Global DNS Load balancing.
