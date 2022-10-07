@@ -1,6 +1,7 @@
 # Blue-Green-Deployments
 
-Blue-Green Deployment is a software/Application rollout methodology in order to minimize interuptions caused by version upgrades. This is achieved by exposing lesser number of users to development staging servers while redirecting majority towards old version or last stable version hosting servers.
-When upgrade version causes issues, particular users can be redirected back to old version or last stable version of application. 
+Blue-Green Deployment is a software/Application rollout methodology in order to minimize interuptions/risk caused by deployments. In this strategy two seperate and identical environments as Blue and Green. Usually Blue environments runs current stable release of application while green environments runs newer or Beta release of application. Adopting this strategy increases service availability, minimize deployment risk with simplied rolling back techniques.In testing stage live user traffic is directed to the green environment (Newer reliase) and in case of event traffic redirected towards blue environment (Stable release) while minimizing service downtime.In this strategy live traffic is completely switched towards Green environment during testing (testing for bugs) which is the major difference with Canary deploymeny where only portion of live traffic redirected towards Beta release. Although this is convinient in the perspective of SRE/DevOps Engineers; there are both pros and cons associated in generic viewpoint. 
+
+![Blue Green Deployment Stategy](https://miro.medium.com/max/4800/1*CvzbdfO9sLeNn_YZfJxu2g.png)
 
 In this repository contains configuration details in Azure environment with Azure Traffic manager for Global DNS Load balancing.
