@@ -18,27 +18,36 @@ terraform {
 # Traffic Manager provisioning #
 #==============================#
 
-resource "azurerm_resource_group" "example" {
-  name     = "example-resources"
+resource "azurerm_resource_group" "rg" {
+  name     = "tm-RG"
   location = "West Europe"
 }
-
-resource "azurerm_public_ip" "example" {
-  name                = "example-public-ip"
-  location            = azurerm_resource_group.example.location
-  resource_group_name = azurerm_resource_group.example.name
+# PIP for Primary End point
+resource "azurerm_public_ip" "prod_pip" {
+  name                = "production_end_pip"
+  location            = azurerm_resource_group.rg.location
+  resource_group_name = azurerm_resource_group.rg.name
   allocation_method   = "Static"
-  domain_name_label   = "example-public-ip"
+  domain_name_label   = "production_end_pip"
+}
+
+#PIP for failover End point
+resource "azurerm_public_ip" "secondary_pip" {
+  name                = "failover_end_pip"
+  location            = azurerm_resource_group.rg.location
+  resource_group_name = azurerm_resource_group.rg.name
+  allocation_method   = "Static"
+  domain_name_label   = "failover_end_pip"
 }
 
 
-resource "azurerm_traffic_manager_profile" "example" {
-  name                   = "example-profile"
-  resource_group_name    = azurerm_resource_group.example.name
-  traffic_routing_method = "Weighted"
+resource "azurerm_traffic_manager_profile" "tm_profile" {
+  name                   = "tm_profile"
+  resource_group_name    = azurerm_resource_group.rg.name
+  traffic_routing_method = "Priority" #For B/G it Priority and for canary should be weighted
 
   dns_config {
-    relative_name = "example-profile"
+    relative_name = "tm-profile"
     ttl           = 100
   }
 
@@ -56,9 +65,16 @@ resource "azurerm_traffic_manager_profile" "example" {
   }
 }
 
-resource "azurerm_traffic_manager_azure_endpoint" "example" {
+resource "azurerm_traffic_manager_azure_endpoint" "prod_ep" {
+  name               = "production-endpoint"
+  profile_id         = azurerm_traffic_manager_profile.tm_profile.id
+  priority             = 1
+  target_resource_id = azurerm_public_ip.prod_pip.id
+}
+
+resource "azurerm_traffic_manager_azure_endpoint" "secondary_ep" {
   name               = "example-endpoint"
-  profile_id         = azurerm_traffic_manager_profile.example.id
-  weight             = 100
-  target_resource_id = azurerm_public_ip.example.id
+  profile_id         = azurerm_traffic_manager_profile.tm_profile.id
+  priority             = 1
+  target_resource_id = azurerm_public_ip.secondary_pip.id
 }
