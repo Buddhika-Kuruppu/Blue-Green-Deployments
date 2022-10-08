@@ -18,15 +18,26 @@ terraform {
 # Traffic Manager provisioning #
 #==============================#
 
-resource "azurerm_resource_group" "rg" {
+resource "azurerm_resource_group" "tm_rg" {
   name     = "tm-RG"
   location = "West Europe"
 }
+
+resource "azurerm_resource_group" "prod_rg" {
+  name     = "prod-RG"
+  location = "West Europe"
+}
+
+resource "azurerm_resource_group" "secondary_rg" {
+  name     = "secondary-RG"
+  location = "West Europe"
+}
+
 # PIP for Primary End point
 resource "azurerm_public_ip" "prod_pip" {
   name                = "production_end_pip"
-  location            = azurerm_resource_group.rg.location
-  resource_group_name = azurerm_resource_group.rg.name
+  location            = azurerm_resource_group.prod_rg.location
+  resource_group_name = azurerm_resource_group.prod_rg.name
   allocation_method   = "Static"
   domain_name_label   = "production_end_pip"
 }
@@ -34,8 +45,8 @@ resource "azurerm_public_ip" "prod_pip" {
 #PIP for failover End point
 resource "azurerm_public_ip" "secondary_pip" {
   name                = "failover_end_pip"
-  location            = azurerm_resource_group.rg.location
-  resource_group_name = azurerm_resource_group.rg.name
+  location            = azurerm_resource_group.secondary_rg.location
+  resource_group_name = azurerm_resource_group.secondary_rg.name
   allocation_method   = "Static"
   domain_name_label   = "failover_end_pip"
 }
